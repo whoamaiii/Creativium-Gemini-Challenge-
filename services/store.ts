@@ -24,6 +24,7 @@ interface AppState {
   deleteStudent: (id: string) => void;
   
   addSession: (session: Omit<SessionEntry, 'id' | 'timeISO'>) => string;
+  updateSession: (id: string, changes: Partial<Omit<SessionEntry, 'id' | 'timeISO'>>) => void;
   deleteSession: (id: string) => void;
   getSession: (id: string) => SessionEntry | undefined;
   getLatestSession: () => SessionEntry | undefined;
@@ -65,6 +66,10 @@ export const useStore = create<AppState>()(
         set((state) => ({ sessions: [newSession, ...state.sessions] }));
         return newSession.id;
       },
+
+      updateSession: (id, changes) => set((state) => ({
+        sessions: state.sessions.map(s => s.id === id ? { ...s, ...changes } : s),
+      })),
       
       deleteSession: (id) => set((state) => ({
         sessions: state.sessions.filter(s => s.id !== id),

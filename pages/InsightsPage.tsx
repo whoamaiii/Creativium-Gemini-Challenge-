@@ -113,7 +113,14 @@ export default function InsightsPage() {
           <h1 className="text-3xl font-bold">Session Insights</h1>
           <p className="text-muted">For {session.student} on {new Date(session.timeISO).toLocaleDateString()}</p>
         </div>
-        {analysis && <ExportToolbar sessionId={id} summaryText={fullSummaryText} />}
+        <div className="flex gap-2">
+          {analysis && <ExportToolbar sessionId={id} summaryText={fullSummaryText} />}
+          {session && (
+            <a href={`#/edit?id=${session.id}`}>
+              <Button variant="secondary">Edit Session</Button>
+            </a>
+          )}
+        </div>
       </div>
       
       {isBusy && !analysis && (
@@ -169,7 +176,7 @@ export default function InsightsPage() {
                   <ConfidenceBar key={i} label={t.label} value={t.confidence * 100} />
                 ))}
               </div>
-            </section>
+            </Section>
             <Section title="Attachments">
               {session.attachments && session.attachments.length > 0 ? (
                 <div className="space-y-4">

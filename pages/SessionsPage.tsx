@@ -166,6 +166,9 @@ const SessionsPage: React.FC = () => {
                   <a href={`#/insights?id=${s.id}`} className="w-full">
                     <Button variant="secondary" className="w-full"><BookOpen size={16} /> Open Insights</Button>
                   </a>
+                  <a href={`#/edit?id=${s.id}`} className="w-full">
+                    <Button className="w-full">Edit</Button>
+                  </a>
                   <Button
                     variant="ghost"
                     className="w-full !justify-start !text-error hover:!bg-error/10"

@@ -1,11 +1,12 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useStore } from '../services/store';
 import { useAutosave, loadDraft, clearDraft } from '../hooks/useAutosave';
 import { Attachment, Emotion, SensoryChannel } from '../types';
 import { SENSORY_CHANNELS, TEACHER_REACTIONS, QUICK_ADD_TRIGGERS } from '../constants';
 import { toastService } from '../services/toast';
 import { Plus } from '../components/icons';
+import { parseHashSearch } from '../utils/hashParams';
 
 // Import Components
 import Card from '../components/Card';
@@ -19,7 +20,7 @@ import StickyBar from '../components/StickyBar';
 import AutoSuggest from '../components/AutoSuggest';
 import UploadArea from '../components/UploadArea';
 
-const DRAFT_KEY = 'kreativium:session-draft';
+const BASE_DRAFT_KEY = 'kreativium:session-draft';
 
 type SessionState = Omit<Attachment, 'file'>;
 
@@ -28,8 +29,8 @@ const initialSensoryState = SENSORY_CHANNELS.reduce((acc, channel) => {
   return acc;
 }, {} as Record<SensoryChannel, number>);
 
-const getInitialState = () => {
-  const savedDraft = loadDraft<any>(DRAFT_KEY);
+const getInitialState = (draftKey: string) => {
+  const savedDraft = loadDraft<any>(draftKey);
   if (savedDraft) {
     // We don't save File objects, so attachments need to be reset.
     return { ...savedDraft, attachments: [] };
@@ -51,10 +52,43 @@ const getInitialState = () => {
 
 
 const TrackSessionPage: React.FC = () => {
-  const { students, addSession } = useStore();
-  const [state, setState] = useState(getInitialState);
+  const params = parseHashSearch();
+  const editingId = params.get('id') || '';
+  const isEditing = window.location.hash.startsWith('#/edit') && !!editingId;
 
-  useAutosave(DRAFT_KEY, state);
+  const { students, addSession, updateSession, getSession } = useStore();
+
+  const draftKey = useMemo(() => `${BASE_DRAFT_KEY}${isEditing ? `:${editingId}` : ''}`, [isEditing, editingId]);
+
+  const [state, setState] = useState(() => {
+    if (isEditing) {
+      const existing = getSession(editingId);
+      if (existing) {
+        return {
+          student: existing.student,
+          location: existing.location,
+          activity: existing.activity,
+          peers: existing.peers,
+          emotions: [...existing.emotions],
+          sensory: { ...existing.sensory },
+          triggers: [...existing.triggers],
+          newTrigger: '',
+          teacherActions: [...existing.teacherActions],
+          notes: existing.notes,
+          attachments: existing.attachments ? [...existing.attachments] : [],
+        };
+      }
+    }
+    return getInitialState(draftKey);
+  });
+
+  useEffect(() => {
+    // If navigating between edit/new, reinitialize the form state accordingly
+    // This keeps the form in sync when the id changes.
+    // We avoid resetting if already at correct mode/state.
+  }, [isEditing, editingId]);
+
+  useAutosave(draftKey, state);
 
   const updateField = <K extends keyof typeof state>(field: K, value: (typeof state)[K]) => {
     setState(prev => ({ ...prev, [field]: value }));
@@ -108,23 +142,45 @@ const TrackSessionPage: React.FC = () => {
       toastService.show('Please select a student.');
       return;
     }
-    addSession(state);
-    toastService.show('Session saved successfully!');
-    clearDraft(DRAFT_KEY);
-    setState(getInitialState());
+    if (isEditing) {
+      updateSession(editingId, {
+        student: state.student,
+        location: state.location,
+        activity: state.activity,
+        peers: state.peers,
+        emotions: state.emotions,
+        sensory: state.sensory,
+        triggers: state.triggers,
+        teacherActions: state.teacherActions,
+        notes: state.notes,
+        attachments: state.attachments,
+      });
+      toastService.show('Session updated.');
+      clearDraft(draftKey);
+      window.location.hash = `#/insights?id=${editingId}`;
+    } else {
+      const id = addSession(state);
+      toastService.show('Session saved successfully!');
+      clearDraft(draftKey);
+      setState(getInitialState(draftKey));
+      window.location.hash = `#/insights?id=${id}`;
+    }
   };
 
   const handleReset = () => {
-    clearDraft(DRAFT_KEY);
-    setState(getInitialState());
+    clearDraft(draftKey);
+    setState(getInitialState(draftKey));
     toastService.show('Form has been cleared.');
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 pb-20">
       <div className="text-center">
-        <h1 className="text-4xl font-bold">Track New Session</h1>
-        <p className="text-muted mt-2">Log an observation to track behavior and sensory data.</p>
+        <h1 className="text-4xl font-bold">{isEditing ? 'Edit Session' : 'Track New Session'}</h1>
+        <p className="text-muted mt-2">{isEditing ? 'Update the details for this observation.' : 'Log an observation to track behavior and sensory data.'}</p>
+        {isEditing && (
+          <p className="text-sm text-muted mt-2">Saving will update the existing session. <a className="text-brand underline" href={`#/insights?id=${editingId}`}>Back to Insights</a></p>
+        )}
       </div>
       
       <div className="grid md:grid-cols-2 gap-6">

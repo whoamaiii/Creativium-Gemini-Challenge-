@@ -16,6 +16,7 @@ import GoalsPage from './pages/GoalsPage';
 
 const routes: Record<string, React.ComponentType> = {
   '/': TrackSessionPage,
+  '/edit': TrackSessionPage,
   '/reports': Reports,
   '/students': StudentsPage,
   '/sessions': SessionsPage,
