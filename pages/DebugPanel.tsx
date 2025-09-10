@@ -60,6 +60,7 @@ const DebugPanel: React.FC = () => {
   };
 
   const handleImportClick = () => fileInputRef.current?.click();
+  const handleMergeClick = () => fileInputRef.current?.click();
 
   const handleImportFile: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
     const file = e.target.files?.[0];
@@ -72,10 +73,33 @@ const DebugPanel: React.FC = () => {
       const sessions = stateLike.sessions ?? [];
       const analyses = stateLike.analyses ?? {};
       const goals = stateLike.goals ?? [];
-      const ok = confirm(`Import ${sessions.length} sessions, ${goals.length} goals, ${students.length} students? This will REPLACE existing data.`);
-      if (!ok) return;
-      useStore.setState({ students, sessions, analyses, goals });
-      toastService.show('Import complete.');
+      const mode = (e.target as HTMLInputElement).dataset.mode;
+      if (mode === 'merge') {
+        const current = useStore.getState();
+        const studentMap = new Map<string, typeof current.students[number]>();
+        [...current.students, ...students].forEach(s => studentMap.set(s.id, s));
+
+        const sessionMap = new Map<string, typeof current.sessions[number]>();
+        [...current.sessions, ...sessions].forEach(s => sessionMap.set(s.id, s));
+
+        const mergedAnalyses = { ...current.analyses, ...analyses };
+
+        const goalMap = new Map<string, typeof current.goals[number]>();
+        [...current.goals, ...goals].forEach(g => goalMap.set(g.id, g));
+
+        useStore.setState({
+          students: Array.from(studentMap.values()),
+          sessions: Array.from(sessionMap.values()).sort((a, b) => new Date(b.timeISO).getTime() - new Date(a.timeISO).getTime()),
+          analyses: mergedAnalyses,
+          goals: Array.from(goalMap.values()).sort((a, b) => new Date(b.createdAtISO).getTime() - new Date(a.createdAtISO).getTime()),
+        });
+        toastService.show('Merge import complete.');
+      } else {
+        const ok = confirm(`Import ${sessions.length} sessions, ${goals.length} goals, ${students.length} students? This will REPLACE existing data.`);
+        if (!ok) return;
+        useStore.setState({ students, sessions, analyses, goals });
+        toastService.show('Import complete.');
+      }
       setRawStorage('');
     } catch (err) {
       console.error('Import error', err);
@@ -101,7 +125,8 @@ const DebugPanel: React.FC = () => {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={handleExportJSON}>Export Backup (JSON)</Button>
-            <Button variant="secondary" onClick={handleImportClick}>Import Backup (Replace)</Button>
+            <Button variant="secondary" onClick={() => { if (fileInputRef.current) fileInputRef.current.dataset.mode = 'replace'; handleImportClick(); }}>Import Backup (Replace)</Button>
+            <Button variant="secondary" onClick={() => { if (fileInputRef.current) fileInputRef.current.dataset.mode = 'merge'; handleMergeClick(); }}>Import Backup (Merge)</Button>
             <input ref={fileInputRef} type="file" accept="application/json" className="hidden" onChange={handleImportFile} />
           </div>
         </div>

@@ -14,6 +14,7 @@ import { Attachment } from '../types';
 import ExportToolbar from '../components/ExportToolbar';
 import CoachPane from '../components/CoachPane';
 import { Lightbulb, Target } from '../components/icons';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 export default function InsightsPage() {
   const qs = parseHashSearch();
@@ -110,7 +111,8 @@ export default function InsightsPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Session Insights</h1>
+          <Breadcrumbs items={[{ label: 'Home', href: '#/' }, { label: 'Sessions', href: '#/sessions' }, { label: 'Insights' }]} />
+          <h1 className="text-3xl font-bold mt-2">Session Insights</h1>
           <p className="text-muted">For {session.student} on {new Date(session.timeISO).toLocaleDateString()}</p>
         </div>
         <div className="flex gap-2">
