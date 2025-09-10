@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kreativium</title>
+
+    <!-- Theme boot: run BEFORE CSS/React to prevent FOUC -->
+    <script>
+      try {
+        const saved = localStorage.getItem('kv:theme');
+        const systemDark = window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved || (systemDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+      } catch (_) {
+        document.documentElement.dataset.theme = 'dark'; // fallback
+      }
+    </script>
+
+    <!-- Core Stylesheets: Must load first to define CSS variables -->
+    <link rel="stylesheet" href="./styles/tokens.css" />
+    <link rel="stylesheet" href="./styles/global.css" />
+    <link rel="stylesheet" href="./styles/print.css" media="print" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Set up Tailwind CSS with our new design tokens
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        bg: 'var(--bg)',
+                        surface: 'var(--surface)',
+                        card: 'var(--card)',
+                        elev: 'var(--surface-2)', // Compatibility: map elev to surface-2
+                        border: 'var(--border)',
+                        text: 'var(--text)',
+                        muted: 'var(--muted)',
+                        brand: 'var(--primary)',
+                        success: 'var(--ok)',
+                        warn: 'var(--warn)',
+                        error: 'var(--error)',
+                    },
+                    borderRadius: {
+                        md: 'var(--radius-md)',
+                        lg: 'var(--radius-lg)',
+                        xl: 'var(--radius-xl)',
+                    },
+                },
+            },
+        };
+    </script>
+    
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
+    "zustand/": "https://aistudiocdn.com/zustand@^5.0.8/",
+    "zustand": "https://aistudiocdn.com/zustand@^5.0.8"
+  }
+}
+</script>
+</head>
+<body class="bg-bg text-text antialiased">
+    <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
+</body>
+</html>

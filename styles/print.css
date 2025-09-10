@@ -1,0 +1,75 @@
+@media print {
+  @page { 
+    margin: 12mm; 
+  }
+  
+  :root, :root[data-theme="dark"] {
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact;
+    
+    /* Force light theme values for printing */
+    --bg: #ffffff;
+    --text: #111111;
+    --surface: #ffffff;
+    --surface-2: #f9fafb;
+    --card: #ffffff;
+    --muted: #555555;
+    --border: #cccccc;
+    --primary: #2563eb;
+    --primary-contrast: #ffffff;
+    --ring: none;
+    --shadow: none;
+    --ok: #059669;
+    --warn: #d97706;
+    --error: #dc2626;
+    color-scheme: light;
+  }
+  
+  html, body { 
+    background: var(--bg) !important; 
+    color: var(--text) !important; 
+    font-size: 10pt;
+  }
+  
+  header, .no-print, .ToastStack, [data-no-print="true"] { 
+    display: none !important; 
+  }
+
+  .PrintOnly { 
+      display: block !important; 
+  }
+  
+  .card, section.card, section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid var(--border) !important;
+    background: var(--card-bg) !important;
+  }
+  
+  h1, h2, h3, h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  
+  .page-break {
+    break-before: page;
+    page-break-before: page;
+  }
+  
+  /* Do not print URLs for internal navigation links */
+  a[href^="#"]::after {
+    content: "" !important;
+  }
+
+  a[href^="http"]::after { 
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #555;
+    word-break: break-all;
+  }
+  
+  .text-brand, .text-primary { color: var(--primary) !important; }
+  .bg-primary { background-color: var(--primary) !important; }
+  .text-primary-contrast { color: var(--primary-contrast) !important; }
+}

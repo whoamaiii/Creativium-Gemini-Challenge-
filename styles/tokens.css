@@ -1,0 +1,53 @@
+:root {
+  /* LIGHT */
+  --bg: #f6f8fc;
+  --text: #0b1220;
+  --surface: #ffffff;
+  --surface-2: #f0f3f9;
+  --card: #ffffff;
+  --muted: #5b6b85;
+  --border: #dbe3f2;
+  --primary: #2563eb; /* blue-600 */
+  --primary-contrast: #ffffff;
+  --ring: 0 0 0 3px rgba(37, 99, 235, 0.35);
+  --shadow: 0 10px 20px rgba(9, 13, 31, 0.12);
+  --radius: 14px;
+  --radius-md: .5rem;
+  --radius-lg: .75rem;
+  --radius-xl: 1rem;
+  --ok: #059669;
+  --warn: #d97706;
+  --error: #dc2626;
+  --card-bg-alpha: rgba(255, 255, 255, 0.5); /* For glass effect */
+}
+
+:root[data-theme="dark"] {
+  /* NAVY DARK */
+  --bg: #0b1220;
+  --text: #e7eefb;
+  --surface: #0f1a2e;
+  --surface-2: #12213a;
+  --card: #121f35;
+  --muted: #9bb0c9;
+  --border: #2a3a57;
+  --primary: #4da3ff;
+  --primary-contrast: #08121f;
+  --ring: 0 0 0 3px rgba(77, 163, 255, 0.35);
+  --shadow: 0 10px 24px rgba(2, 10, 25, 0.5);
+  --radius: 14px;
+  --radius-md: .5rem;
+  --radius-lg: .75rem;
+  --radius-xl: 1rem;
+  --ok: #10b981;
+  --warn: #f59e0b;
+  --error: #ef4444;
+  --card-bg-alpha: rgba(31, 41, 55, 0.5); /* For glass effect */
+}
+
+/* Utility vars for components that used older names */
+:root {
+  --panel-bg: var(--surface);
+  --card-bg: var(--card);
+  --text-muted: var(--muted);
+  --outline: var(--primary);
+}
