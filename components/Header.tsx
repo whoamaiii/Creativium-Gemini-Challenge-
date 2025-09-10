@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrainCircuit, Menu, X, BookOpen } from './icons';
+import { BrainCircuit, Menu, X, BookOpen, Moon, Sun } from './icons';
 import useReducedMotion from '../hooks/useReducedMotion';
 
 const NavLink: React.FC<{ href: string; children: React.ReactNode; currentPath: string }> = ({ href, children, currentPath }) => {
@@ -33,6 +33,13 @@ const Header: React.FC = () => {
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, []);
     
+    const toggleTheme = () => {
+      const current = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('kv:theme', next); } catch {}
+    };
+
     const navItems = (
         <>
             <NavLink href="#/" currentPath={currentPath}>Track Session</NavLink>
@@ -42,6 +49,14 @@ const Header: React.FC = () => {
             <NavLink href="#/goals" currentPath={currentPath}>Goals</NavLink>
             <NavLink href="#/insights" currentPath={currentPath}>Insights</NavLink>
             <NavLink href="#/coach" currentPath={currentPath}>Coach</NavLink>
+            <button
+              onClick={toggleTheme}
+              className="px-3 py-2 rounded-md text-sm font-medium text-muted hover:bg-surface-2 hover:text-text"
+              aria-label="Toggle theme"
+              title="Toggle theme"
+            >
+              {document.documentElement?.dataset?.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
         </>
     );
 
