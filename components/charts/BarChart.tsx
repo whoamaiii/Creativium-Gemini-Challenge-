@@ -9,9 +9,10 @@ interface DataPoint {
 interface BarChartProps {
   data: DataPoint[];
   layout?: 'vertical' | 'horizontal';
+  onBarClick?: (datum: DataPoint) => void;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, layout = 'vertical' }) => {
+const BarChart: React.FC<BarChartProps> = ({ data, layout = 'vertical', onBarClick }) => {
   const prefersReducedMotion = useReducedMotion();
   
   if (!data || data.length === 0) {
@@ -66,7 +67,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, layout = 'vertical' }) => {
                 y={y}
                 width={width}
                 height={height}
-                className="fill-brand/70 hover:fill-brand transition-colors"
+                className={`fill-brand/70 hover:fill-brand transition-colors ${onBarClick ? 'cursor-pointer' : ''}`}
+                onClick={onBarClick ? () => onBarClick(d) : undefined}
               >
                 {!prefersReducedMotion && (
                   <animate

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '../services/store';
 import Card from '../components/Card';
 import Button from '../components/Button';
@@ -20,6 +20,29 @@ const SessionsPage: React.FC = () => {
   const studentNames = useMemo(() => {
     return [...storeStudents].map(s => s.name).sort((a, b) => a.localeCompare(b));
   }, [storeStudents]);
+
+  // Read filters from hash search (e.g., #/sessions?student=Alex&from=2025-05-01&to=2025-05-31&q=noise)
+  useEffect(() => {
+    const applyFromHash = () => {
+      const hash = window.location.hash;
+      const qsIndex = hash.indexOf('?');
+      const query = qsIndex >= 0 ? hash.slice(qsIndex + 1) : '';
+      const params = new URLSearchParams(query);
+      const student = params.get('student');
+      const q = params.get('q');
+      const from = params.get('from');
+      const to = params.get('to');
+      if (student) setStudentFilter(student);
+      if (q) setQuery(q);
+      if (from) setFromDate(from);
+      if (to) setToDate(to);
+      setPage(1);
+    };
+    applyFromHash();
+    const onHash = () => applyFromHash();
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   const filtered = useMemo(() => {
     return sessions.filter(s => {
