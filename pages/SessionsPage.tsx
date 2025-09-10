@@ -8,15 +8,17 @@ import { formatDateTime } from '../utils/format';
 import { BookOpen, Trash, Filter } from '../components/icons';
 
 const SessionsPage: React.FC = () => {
-  const { sessions, deleteSession } = useStore();
+  const { sessions, deleteSession, students: storeStudents } = useStore();
   const [query, setQuery] = useState('');
   const [studentFilter, setStudentFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
-  const students = useMemo(() => {
-    const set = new Set<string>();
-    sessions.forEach(s => set.add(s.student));
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [sessions]);
+  const studentNames = useMemo(() => {
+    return [...storeStudents].map(s => s.name).sort((a, b) => a.localeCompare(b));
+  }, [storeStudents]);
 
   const filtered = useMemo(() => {
     return sessions.filter(s => {
@@ -24,9 +26,20 @@ const SessionsPage: React.FC = () => {
         ? [s.activity, s.location, s.notes, s.triggers.join(' '), s.teacherActions.join(' ')].join(' ').toLowerCase().includes(query.toLowerCase())
         : true;
       const matchesStudent = studentFilter === 'all' ? true : s.student === studentFilter;
-      return matchesQuery && matchesStudent;
+      const time = new Date(s.timeISO).getTime();
+      const fromOk = fromDate ? time >= new Date(fromDate).getTime() : true;
+      const toOk = toDate ? time <= new Date(toDate).getTime() + 24*60*60*1000 - 1 : true;
+      return matchesQuery && matchesStudent && fromOk && toOk;
     });
-  }, [sessions, query, studentFilter]);
+  }, [sessions, query, studentFilter, fromDate, toDate]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paged = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return filtered.slice(start, end);
+  }, [filtered, currentPage, pageSize]);
 
   return (
     <div className="space-y-6">
@@ -47,10 +60,52 @@ const SessionsPage: React.FC = () => {
           <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
             <Select id="student" label="Student" value={studentFilter} onChange={(e) => setStudentFilter(e.target.value)}>
               <option value="all">All students</option>
-              {students.map(name => (
+              {studentNames.map(name => (
                 <option key={name} value={name}>{name}</option>
               ))}
             </Select>
+            <Select id="page-size" label="Page size" value={String(pageSize)} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}>
+              {[8, 12, 24, 48].map(sz => (
+                <option key={sz} value={sz}>{sz} per page</option>
+              ))}
+            </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <TextInput
+                id="from-date"
+                label="From date"
+                type="date"
+                value={fromDate}
+                onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
+              />
+              <TextInput
+                id="to-date"
+                label="To date"
+                type="date"
+                value={toDate}
+                onChange={(e) => { setToDate(e.target.value); setPage(1); }}
+              />
+            </div>
+            <div className="flex items-end justify-end gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="!px-3"
+              >
+                Prev
+              </Button>
+              <div className="text-sm text-muted">Page {currentPage} / {totalPages}</div>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="!px-3"
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
@@ -62,13 +117,22 @@ const SessionsPage: React.FC = () => {
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {filtered.map(s => (
+          {paged.map(s => (
             <Card key={s.id} isHoverable>
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-muted">{formatDateTime(s.timeISO)}</p>
                   <h3 className="text-lg font-semibold">{s.activity || 'Untitled Activity'}</h3>
-                  <p className="text-sm text-muted">{s.student} • {s.location || 'Unknown location'} • {s.peers}</p>
+                  <p className="text-sm text-muted">
+                    {(() => {
+                      const stu = storeStudents.find(st => st.name === s.student);
+                      const href = stu ? `#/student?id=${stu.id}` : '#/students';
+                      return (
+                        <a className="text-brand hover:underline" href={href}>{s.student}</a>
+                      );
+                    })()} 
+                    • {s.location || 'Unknown location'} • {s.peers}
+                  </p>
                   {s.emotions.length > 0 && (
                     <p className="text-sm"><span className="text-muted">Emotions:</span> {s.emotions.join(', ')}</p>
                   )}
