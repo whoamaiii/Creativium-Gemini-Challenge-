@@ -36,6 +36,7 @@ interface AppState {
   addProgressNote: (goalId: string, note: string) => void;
 
   clearAllSessions: () => void;
+  deleteSessions: (ids: string[]) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -128,6 +129,12 @@ export const useStore = create<AppState>()(
       })),
       
       clearAllSessions: () => set({ sessions: [], analyses: {}, goals: [] }),
+
+      deleteSessions: (ids: string[]) => set((state) => ({
+        sessions: state.sessions.filter(s => !ids.includes(s.id)),
+        analyses: Object.fromEntries(Object.entries(state.analyses).filter(([k]) => !ids.includes(k))),
+        goals: state.goals.filter(g => !ids.includes(g.originSessionId)),
+      })),
 
     }),
     {

@@ -6,9 +6,10 @@ import TextInput from '../components/TextInput';
 import Select from '../components/Select';
 import { formatDateTime } from '../utils/format';
 import { BookOpen, Trash, Filter } from '../components/icons';
+import { downloadCSV } from '../utils/csv';
 
 const SessionsPage: React.FC = () => {
-  const { sessions, deleteSession, students: storeStudents } = useStore();
+  const { sessions, deleteSession, deleteSessions, students: storeStudents } = useStore();
   const [query, setQuery] = useState('');
   const [studentFilter, setStudentFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -104,6 +105,27 @@ const SessionsPage: React.FC = () => {
                 className="!px-3"
               >
                 Next
+              </Button>
+              <Button
+                type="button"
+                onClick={() => downloadCSV(filtered)}
+                disabled={filtered.length === 0}
+              >
+                Export CSV
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="!text-error hover:!bg-error/10"
+                onClick={() => {
+                  if (filtered.length === 0) return;
+                  const ok = confirm(`Delete ${filtered.length} filtered session(s)? This cannot be undone.`);
+                  if (!ok) return;
+                  deleteSessions(filtered.map(s => s.id));
+                }}
+                disabled={filtered.length === 0}
+              >
+                Delete Filtered
               </Button>
             </div>
           </div>
