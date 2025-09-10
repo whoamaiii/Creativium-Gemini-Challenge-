@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrainCircuit, Menu, X, BookOpen } from './icons';
 import useReducedMotion from '../hooks/useReducedMotion';
 
@@ -37,6 +37,7 @@ const Header: React.FC = () => {
         <>
             <NavLink href="#/" currentPath={currentPath}>Track Session</NavLink>
             <NavLink href="#/reports" currentPath={currentPath}>Reports</NavLink>
+            <NavLink href="#/sessions" currentPath={currentPath}>Sessions</NavLink>
             <NavLink href="#/students" currentPath={currentPath}>Students</NavLink>
             <NavLink href="#/goals" currentPath={currentPath}>Goals</NavLink>
             <NavLink href="#/insights" currentPath={currentPath}>Insights</NavLink>

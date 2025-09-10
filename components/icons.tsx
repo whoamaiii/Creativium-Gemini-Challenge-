@@ -48,3 +48,4 @@ export const Trash = createIcon(<><polyline points="3 6 5 6 21 6" /><path d="M19
 export const Menu = createIcon(<><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></>);
 export const X = createIcon(<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>);
 export const Target = createIcon(<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>);
+export const Filter = createIcon(<><polygon points="22 3 2 3 10 12 10 19 14 21 14 12 22 3" /></>);
