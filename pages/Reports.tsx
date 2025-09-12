@@ -175,7 +175,14 @@ const Reports: React.FC = () => {
           <Card>
              <h2 className="text-xl font-semibold mb-4">Sensory Events</h2>
              <div className="h-64">
-                <BarChart data={sensoryFrequency(sessions)} layout="horizontal" />
+                <BarChart
+                  data={sensoryFrequency(sessions)}
+                  layout="horizontal"
+                  onBarClick={(d) => {
+                    const q = encodeURIComponent(d.label);
+                    window.location.hash = `#/sessions?q=${q}`;
+                  }}
+                />
              </div>
           </Card>
       </div>

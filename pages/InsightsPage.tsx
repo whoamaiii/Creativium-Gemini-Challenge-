@@ -14,6 +14,7 @@ import { Attachment } from '../types';
 import ExportToolbar from '../components/ExportToolbar';
 import CoachPane from '../components/CoachPane';
 import { Lightbulb, Target } from '../components/icons';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 export default function InsightsPage() {
   const qs = parseHashSearch();
@@ -110,10 +111,18 @@ export default function InsightsPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Session Insights</h1>
+          <Breadcrumbs items={[{ label: 'Home', href: '#/' }, { label: 'Sessions', href: '#/sessions' }, { label: 'Insights' }]} />
+          <h1 className="text-3xl font-bold mt-2">Session Insights</h1>
           <p className="text-muted">For {session.student} on {new Date(session.timeISO).toLocaleDateString()}</p>
         </div>
-        {analysis && <ExportToolbar sessionId={id} summaryText={fullSummaryText} />}
+        <div className="flex gap-2">
+          {analysis && <ExportToolbar sessionId={id} summaryText={fullSummaryText} />}
+          {session && (
+            <a href={`#/edit?id=${session.id}`}>
+              <Button variant="secondary">Edit Session</Button>
+            </a>
+          )}
+        </div>
       </div>
       
       {isBusy && !analysis && (
@@ -169,7 +178,7 @@ export default function InsightsPage() {
                   <ConfidenceBar key={i} label={t.label} value={t.confidence * 100} />
                 ))}
               </div>
-            </section>
+            </Section>
             <Section title="Attachments">
               {session.attachments && session.attachments.length > 0 ? (
                 <div className="space-y-4">

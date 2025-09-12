@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import AppShell from './components/AppShell';
 import ComponentShowcase from './pages/ComponentShowcase';
 import DebugPanel from './pages/DebugPanel';
@@ -6,6 +6,7 @@ import Reports from './pages/Reports';
 import TrackSessionPage from './pages/TrackSessionPage';
 import StudentsPage from './pages/StudentsPage';
 import StudentProfile from './pages/StudentProfile';
+import SessionsPage from './pages/SessionsPage';
 import ToastContainer from './components/Toast';
 import { readHash } from './utils/hashParams';
 import InsightsPage from './pages/InsightsPage';
@@ -15,8 +16,10 @@ import GoalsPage from './pages/GoalsPage';
 
 const routes: Record<string, React.ComponentType> = {
   '/': TrackSessionPage,
+  '/edit': TrackSessionPage,
   '/reports': Reports,
   '/students': StudentsPage,
+  '/sessions': SessionsPage,
   '/student': StudentProfile, // Assumes an ID, e.g., #/student?id=123
   '/insights': InsightsPage,
   '/coach': CoachPage,

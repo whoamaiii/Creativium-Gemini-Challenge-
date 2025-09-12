@@ -7,6 +7,7 @@ import { formatDate } from '../utils/format';
 import LineChart from '../components/charts/LineChart';
 import { trendPoints } from '../utils/analytics';
 import Button from '../components/Button';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const StudentProfile: React.FC = () => {
   const { students, sessions } = useStore();
@@ -31,7 +32,8 @@ const StudentProfile: React.FC = () => {
     <div className="space-y-8">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-4xl font-bold">{student.name}</h1>
+          <Breadcrumbs items={[{ label: 'Home', href: '#/' }, { label: 'Students', href: '#/students' }, { label: student.name }]} />
+          <h1 className="text-4xl font-bold mt-2">{student.name}</h1>
           <p className="text-muted mt-2">An overview of logged sessions and trends.</p>
         </div>
         <a href="#/">

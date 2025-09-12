@@ -24,6 +24,8 @@ interface AppState {
   deleteStudent: (id: string) => void;
   
   addSession: (session: Omit<SessionEntry, 'id' | 'timeISO'>) => string;
+  updateSession: (id: string, changes: Partial<Omit<SessionEntry, 'id' | 'timeISO'>>) => void;
+  deleteSession: (id: string) => void;
   getSession: (id: string) => SessionEntry | undefined;
   getLatestSession: () => SessionEntry | undefined;
   
@@ -35,6 +37,7 @@ interface AppState {
   addProgressNote: (goalId: string, note: string) => void;
 
   clearAllSessions: () => void;
+  deleteSessions: (ids: string[]) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -63,6 +66,14 @@ export const useStore = create<AppState>()(
         set((state) => ({ sessions: [newSession, ...state.sessions] }));
         return newSession.id;
       },
+
+      updateSession: (id, changes) => set((state) => ({
+        sessions: state.sessions.map(s => s.id === id ? { ...s, ...changes } : s),
+      })),
+      
+      deleteSession: (id) => set((state) => ({
+        sessions: state.sessions.filter(s => s.id !== id),
+      })),
       
       getSession: (id: string) => get().sessions.find(s => s.id === id),
 
@@ -123,6 +134,12 @@ export const useStore = create<AppState>()(
       })),
       
       clearAllSessions: () => set({ sessions: [], analyses: {}, goals: [] }),
+
+      deleteSessions: (ids: string[]) => set((state) => ({
+        sessions: state.sessions.filter(s => !ids.includes(s.id)),
+        analyses: Object.fromEntries(Object.entries(state.analyses).filter(([k]) => !ids.includes(k))),
+        goals: state.goals.filter(g => !ids.includes(g.originSessionId)),
+      })),
 
     }),
     {
